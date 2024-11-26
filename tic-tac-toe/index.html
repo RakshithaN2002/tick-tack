@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+
+<body>
+    <div class="container">
+        <h1 class="game-title">Tic-Tac-Toe</h1>
+
+        <div class="controls">
+            <label for="gameMode">Game Mode:</label>
+            <select id="gameMode">
+                <option value="ai">Play with AI</option>
+                <option value="friend">Play with Friend</option>
+            </select>
+        </div>
+
+        <div class="board-container">
+            <div id="board" class="game-board"></div>
+        </div>
+
+        <div id="status" class="status">Welcome to Tic-Tac-Toe!</div>
+
+        <div class="controls">
+            <label for="gridSize">Grid Size:</label>
+            <input type="number" id="gridSize" value="3" min="3" max="10">
+
+            <label for="winStreak">Win Streak:</label>
+            <input type="number" id="winStreak" value="3" min="3" max="10">
+        </div>
+
+        <div class="button-group">
+            <button id="startGame" class="btn">Start Game</button>
+            <button id="reset" class="btn" style="display: none;">Reset</button>
+        </div>
+
+        <div class="player-indicators">
+            <div id="playerX" class="player-indicator">Player X</div>
+            <div id="playerO" class="player-indicator">Player O</div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .game-container {
+            text-align: center;
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        select,
+        input,
+        button {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin: 10px 0;
+        }
+
+        select,
+        input {
+            width: 100%;
+        }
+
+        .game-board {
+            display: grid;
+            gap: 5px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 360px;
+            margin-left: auto;
+            margin-right: auto;
+            grid-template-columns: repeat(3, 1fr);
+            transition: all 0.3s ease;
+        }
+
+        .cell {
+            width: 100%;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f0f4f8;
+            border-radius: 10px;
+            font-size: 30px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .cell:hover {
+            background: #e0e7ff;
+        }
+
+        .cell.taken {
+            pointer-events: none;
+            background: #d0d0d0;
+        }
+
+        .status {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .active {
+            color: #3498db;
+            text-decoration: underline;
+        }
+
+        .result {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2ecc71;
+        }
+
+        .reset-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background: #c0392b;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .game-board {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-container">
+        <h2>Tic-Tac-Toe</h2>
+        <div>
+            <label for="gameMode">Select Game Mode: </label>
+            <select id="gameMode">
+                <option value="ai">Play with AI</option>
+                <option value="friend">Play with Friend</option>
+            </select>
+        </div>
+
+        <div id="board" class="game-board"></div>
+        <div id="status" class="status">Player X's turn</div>
+
+        <div class="controls">
+            <button id="startGame">Start Game</button>
+            <button id="reset" class="reset-btn">Reset</button>
+        </div>
+
+        <div>
+            <label for="gridSize">Grid Size:</label>
+            <input type="number" id="gridSize" value="3" min="3" max="10">
+        </div>
+        <div>
+            <label for="winStreak">Win Streak:</label>
+            <input type="number" id="winStreak" value="3" min="3" max="10">
+        </div>
+
+        <div>
+            <div id="playerX" class="player-indicator">Player X</div>
+            <div id="playerO" class="player-indicator">Player O</div>
+        </div>
+    </div>
+
+    <script>
+        const board = document.getElementById("board");
+        const statusDisplay = document.getElementById("status");
+        const resetButton = document.getElementById("reset");
+        const startGameButton = document.getElementById("startGame");
+        const gridSizeInput = document.getElementById("gridSize");
+        const winStreakInput = document.getElementById("winStreak");
+        const gameModeSelect = document.getElementById("gameMode");
+        const playerXIndicator = document.getElementById("playerX");
+        const playerOIndicator = document.getElementById("playerO");
+
+        let currentPlayer = "X";
+        let gameActive = true;
+        let boardState = [];
+        let gridSize = 3;
+        let winStreak = 3;
+        let opponentType = "computer"; // 'computer' for AI, 'friend' for multiplayer
+
+        function createBoard() {
+            board.innerHTML = "";
+            board.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+            boardState = Array(gridSize).fill().map(() => Array(gridSize).fill(""));
+
+            for (let i = 0; i < gridSize * gridSize; i++) {
+                const cell = document.createElement("div");
+                cell.classList.add("cell");
+                cell.dataset.row = Math.floor(i / gridSize);
+                cell.dataset.col = i % gridSize;
+                cell.addEventListener("click", handleCellClick);
+                board.appendChild(cell);
+            }
+            statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
+            updateTurnIndicator();
+        }
+
+        function updateTurnIndicator() {
+            playerXIndicator.classList.toggle("active", currentPlayer === "X");
+            playerOIndicator.classList.toggle("active", currentPlayer === "O");
+        }
+
+        function handleCellClick(event) {
+            const cell = event.target;
+            const row = parseInt(cell.dataset.row);
+            const col = parseInt(cell.dataset.col);
+
+            if (boardState[row][col] !== "" || !gameActive) return;
+
+            boardState[row][col] = currentPlayer;
+            cell.textContent = currentPlayer;
+            cell.classList.add("taken");
+
+            if (checkWinner(row, col)) {
+                statusDisplay.textContent = `Player ${currentPlayer} wins!`;
+                statusDisplay.classList.add("result");
+                gameActive = false;
+                resetButton.style.display = "inline-block";
+                return;
+            }
+
+            if (boardState.flat().every(cell => cell !== "")) {
+                statusDisplay.textContent = "It's a tie!";
+                statusDisplay.classList.add("result");
+                gameActive = false;
+                resetButton.style.display = "inline-block";
+                return;
+            }
+
+            currentPlayer = currentPlayer === "X" ? "O" : "X";
+            statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
+            updateTurnIndicator();
+
+            if (opponentType === "computer" && currentPlayer === "O") {
+                setTimeout(computerMove, 500);
+            }
+        }
+
+        function computerMove() {
+            if (!gameActive) return;
+
+            for (let row = 0; row < gridSize; row++) {
+                for (let col = 0; col < gridSize; col++) {
+                    if (boardState[row][col] === "") {
+                        boardState[row][col] = "O";
+                        const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                        cell.textContent = "O";
+                        cell.classList.add("taken");
+
+                        if (checkWinner(row, col)) {
+                            statusDisplay.textContent = `Player O wins!`;
+                            statusDisplay.classList.add("result");
+                            gameActive = false;
+                            resetButton.style.display = "inline-block";
+                            return;
+                        }
+
+                        if (boardState.flat().every(cell => cell !== "")) {
+                            statusDisplay.textContent = "It's a tie!";
+                            statusDisplay.classList.add("result");
+                            gameActive = false;
+                            resetButton.style.display = "inline-block";
+                            return;
+                        }
+
+                        currentPlayer = "X";
+                        statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
+                        updateTurnIndicator();
+                        return;
+                    }
+                }
+            }
+        }
+
+        function checkWinner(row, col) {
+            // Check row
+            if (boardState[row].every(cell => cell === currentPlayer)) return true;
+
+            // Check column
+            if (boardState.every(row => row[col] === currentPlayer)) return true;
+
+            // Check diagonal
+            if (row === col && boardState.every((row, idx) => row[idx] === currentPlayer)) return true;
+            if (row + col === gridSize - 1 && boardState.every((row, idx) => row[gridSize - 1 - idx] === currentPlayer)) return true;
+
+            return false;
+        }
+
+        function startGame() {
+            gameActive = true;
+            currentPlayer = "X";
+            resetButton.style.display = "none";
+            createBoard();
+        }
+
+        function resetGame() {
+            gameActive = true;
+            currentPlayer = "X";
+            createBoard();
+            statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
+            statusDisplay.classList.remove("result");
+            resetButton.style.display = "none";
+        }
+
+        startGameButton.addEventListener("click", () => {
+            gridSize = parseInt(gridSizeInput.value);
+            winStreak = parseInt(winStreakInput.value);
+            opponentType = gameModeSelect.value;
+            startGame();
+        });
+
+        resetButton.addEventListener("click", resetGame);
+
+        startGame();
+
+    </script>
+</body>
+
+</html>

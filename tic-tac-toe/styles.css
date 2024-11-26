@@ -1,0 +1,160 @@
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Arial', sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #2b5876, #4e4376);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* Container */
+.container {
+  text-align: center;
+  padding: 20px;
+  max-width: 500px;
+  width: 90%;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Title */
+.game-title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+/* Game Board */
+.game-board {
+  display: grid;
+  gap: 5px;
+  margin: 20px auto;
+  width: fit-content;
+}
+
+.cell {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  background: #fff;
+  color: #333;
+  font-size: 24px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s, background 0.3s;
+}
+
+.cell:hover {
+  background: #ffd700;
+  transform: scale(1.1);
+}
+
+.cell.taken {
+  pointer-events: none;
+  background: #2b5876;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* Status */
+.status {
+  margin-top: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ffd700;
+}
+
+/* Controls */
+.controls {
+  margin: 15px 0;
+}
+
+label {
+  margin-right: 10px;
+}
+
+input, select {
+  padding: 5px;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+/* Buttons */
+.button-group {
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 10px 20px;
+  background: #ffd700;
+  color: #333;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 4px 10px rgba(255, 215, 0, 0.5);
+}
+
+/* Player Indicators */
+.player-indicators {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+}
+
+.player-indicator {
+  font-size: 1.2rem;
+  color: #ddd;
+  transition: color 0.3s;
+}
+
+.player-indicator.active {
+  color: #ffd700;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .cell {
+    width: 50px;
+    height: 50px;
+    font-size: 18px;
+  }
+
+  .btn {
+    font-size: 0.9rem;
+  }
+}
+
+
